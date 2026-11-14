@@ -123,7 +123,7 @@ export function ieee754_hex_to_binary(ieee754_hex, p, lookup_table) {
 			binary_output = integer_part;
 		}
     }
-    console.log("Float to binary = ", binary_output)
+//    console.log("Float to binary = ", binary_output)
     return binary_output;
 }
 
