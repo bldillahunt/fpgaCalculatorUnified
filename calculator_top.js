@@ -259,7 +259,7 @@ function convert_to_binary(operand, input_mode, int_bits, frac_bits) {
     if (input_mode === "REAL") {
         return binary_string_to_int_list(real_to_twos_comp_binary(operand, int_bits, frac_bits));
     } else if (input_mode === "HEX") {
-        return binary_string_to_int_list(hexadecimal_to_binary(operand, int_bits, frac_bits, lookup_table));
+        return binary_string_to_int_list(hexadecimal_to_binary(operand, int_bits, lookup_table));
     } else if (input_mode === "FP32") {
         return ieee754_hex_to_binary(operand, precision_profile["SINGLE"], lookup_table);
     } else if (input_mode === "FP64") {
