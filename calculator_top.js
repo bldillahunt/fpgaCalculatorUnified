@@ -367,6 +367,12 @@ function processButton(val) {
         outputBox.textContent = calcResult;
 		currentOutputValue = calcResult;
 		currentOutputType = outputMode;
+
+		if (typeof gtag === 'function') {
+			gtag('event', 'calculate', {
+		  		trigger_method: val
+			});
+		}
     }
     else if (val === "Back")
     {
