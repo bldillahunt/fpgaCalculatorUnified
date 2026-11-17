@@ -55,7 +55,7 @@ def gui_entry_parameters(value, input_mode, output_mode, int_size, frac_size):
 	display_c = displays[2]
 	return display_b
 
-if False:
+if True:
 	# Helper to execute calculations through your Tkinter app state silently
 	def run_silent_fuzz(val, in_m, out_m, i_sz, f_sz):
 		return gui_entry_parameters(val, in_m, out_m, i_sz, f_sz)
@@ -671,21 +671,30 @@ for tests, test_a, test_b, pos_right, neg_right, pos_left, neg_left, int_size, f
 				
 			math_a.append(gui_entry_parameters(input_data_a, tests, "BIN", int_size, frac_size))
 
+			if (tests == "HEX"):
+				a_spr_radix_index = single_positive_right_vectors[i].index('.')
+				a_spr_entry_value = single_positive_right_vectors[i][:a_spr_radix_index] + single_positive_right_vectors[i][a_spr_radix_index+1:]
+				a_snl_radix_index = single_negative_left_vectors[i].index('.')
+				a_snl_entry_value = single_negative_left_vectors[i][:a_snl_radix_index] + single_negative_left_vectors[i][a_snl_radix_index+1:]
+			else:
+				a_spr_entry_value = single_positive_right_vectors[i]
+				a_snl_entry_value = single_negative_left_vectors[i]
+
 			if (op == '+'):
-				math_a_real_result = Decimal(binary_to_real(single_positive_right_vectors[i])) + Decimal(binary_to_real(single_negative_left_vectors[i]))
+				math_a_real_result = Decimal(binary_to_real(a_spr_entry_value)) + Decimal(binary_to_real(a_snl_entry_value))
 			elif (op == '-'):
-				math_a_real_result = Decimal(binary_to_real(single_positive_right_vectors[i])) - Decimal(binary_to_real(single_negative_left_vectors[i]))
+				math_a_real_result = Decimal(binary_to_real(a_spr_entry_value)) - Decimal(binary_to_real(a_snl_entry_value))
 			elif (op == '*'):
-				math_a_real_result = Decimal(binary_to_real(single_positive_right_vectors[i])) * Decimal(binary_to_real(single_negative_left_vectors[i]))
+				math_a_real_result = Decimal(binary_to_real(a_spr_entry_value)) * Decimal(binary_to_real(a_snl_entry_value))
 			elif (op == '/'):
-				math_a_real_result = Decimal(binary_to_real(single_positive_right_vectors[i])) / Decimal(binary_to_real(single_negative_left_vectors[i]))
+				math_a_real_result = Decimal(binary_to_real(a_spr_entry_value)) / Decimal(binary_to_real(a_snl_entry_value))
 			elif (op == '%'):
-				math_a_real_result = Decimal(binary_to_real(single_positive_right_vectors[i])) % Decimal(binary_to_real(single_negative_left_vectors[i]))
+				math_a_real_result = Decimal(binary_to_real(a_spr_entry_value)) % Decimal(binary_to_real(a_snl_entry_value))
 
 			math_a_real = Decimal(binary_to_real(binary_string_to_int_list(math_a[i])))
 
 			if (math_a_real_result != math_a_real):
-				print("Mismatch: output A = ", math_a_real, "actual = ", math_a_real_result, list_to_string(single_positive_right_vectors[i]), list_to_string(single_negative_left_vectors[i]), op, tests)
+				print("Mismatch: output A = ", math_a_real, "actual = ", math_a_real_result, list_to_string(a_spr_entry_value), list_to_string(a_snl_entry_value), op, tests)
 				print(input_data_a)
 				error_counter += 1
 
@@ -694,21 +703,30 @@ for tests, test_a, test_b, pos_right, neg_right, pos_left, neg_left, int_size, f
 			input_data_b = neg_right[i] + op + pos_left[i]
 			math_b.append(gui_entry_parameters(input_data_b, tests, "BIN", int_size, frac_size))
 
+			if (tests == "HEX"):
+				b_snr_radix_index = single_negative_right_vectors[i].index('.')
+				b_snr_entry_value = single_negative_right_vectors[i][:b_snr_radix_index] + single_negative_right_vectors[i][b_snr_radix_index+1:]
+				b_spl_radix_index = single_positive_left_vectors[i].index('.')
+				b_spl_entry_value = single_positive_left_vectors[i][:b_spl_radix_index] + single_positive_left_vectors[i][b_spl_radix_index+1:]
+			else:
+				b_snr_entry_value = single_negative_right_vectors[i]
+				b_spl_entry_value = single_positive_left_vectors[i]
+
 			if (op == '+'):
-				math_b_real_result = Decimal(binary_to_real(single_negative_right_vectors[i])) + Decimal(binary_to_real(single_positive_left_vectors[i]))
+				math_b_real_result = Decimal(binary_to_real(b_snr_entry_value)) + Decimal(binary_to_real(b_spl_entry_value))
 			elif (op == '-'):
-				math_b_real_result = Decimal(binary_to_real(single_negative_right_vectors[i])) - Decimal(binary_to_real(single_positive_left_vectors[i]))
+				math_b_real_result = Decimal(binary_to_real(b_snr_entry_value)) - Decimal(binary_to_real(b_spl_entry_value))
 			elif (op == '*'):
-				math_b_real_result = Decimal(binary_to_real(single_negative_right_vectors[i])) * Decimal(binary_to_real(single_positive_left_vectors[i]))
+				math_b_real_result = Decimal(binary_to_real(b_snr_entry_value)) * Decimal(binary_to_real(b_spl_entry_value))
 			elif (op == '/'):
-				math_b_real_result = Decimal(binary_to_real(single_negative_right_vectors[i])) / Decimal(binary_to_real(single_positive_left_vectors[i]))
+				math_b_real_result = Decimal(binary_to_real(b_snr_entry_value)) / Decimal(binary_to_real(b_spl_entry_value))
 			elif (op == '%'):
-				math_b_real_result = Decimal(binary_to_real(single_negative_right_vectors[i])) % Decimal(binary_to_real(single_positive_left_vectors[i]))
+				math_b_real_result = Decimal(binary_to_real(b_snr_entry_value)) % Decimal(binary_to_real(b_spl_entry_value))
 
 			math_b_real = Decimal(binary_to_real(binary_string_to_int_list(math_b[i])))
 
 			if (math_b_real_result != math_b_real):
-				print("Mismatch: output B = ", math_b_real, "actual = ", math_b_real_result, list_to_string(single_negative_right_vectors[i]), list_to_string(single_positive_left_vectors[i]), op, tests)
+				print("Mismatch: output B = ", math_b_real, "actual = ", math_b_real_result, list_to_string(b_snr_entry_value), list_to_string(b_spl_entry_value), op, tests)
 				print(input_data_b)
 				error_counter += 1
 #						input("Press enter to continue")
