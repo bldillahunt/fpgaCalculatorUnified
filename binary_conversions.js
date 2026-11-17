@@ -112,7 +112,7 @@ export function ieee754_hex_to_binary(ieee754_hex, p, lookup_table) {
         }
 
 		let integer_part = binary_int_twos_comp.slice(0, 2);
-		let fraction_part = concat(binary_int_twos_comp.slice(2));
+		let fraction_part = binary_int_twos_comp.slice(2);
 
 		if (fraction_part.includes(1))
 		{

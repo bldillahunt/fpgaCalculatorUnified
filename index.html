@@ -6,7 +6,10 @@
 		window.dataLayer = window.dataLayer || [];
 		function gtag(){dataLayer.push(arguments);}
 		gtag('js', new Date());
-		gtag('config', 'G-YWXKTWJWB2');
+
+		if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' && window.location.protocol !== 'file:') {
+			gtag('config', 'G-YWXKTWJWB2');
+		}
 	</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -372,5 +375,167 @@
         </div>
     </div>
 	<script type="module" src="calculator_top.js"></script>
+	<script type="module">
+		import { compute_evaluation_step } from './calculator_top.js';
+
+		const inputBox = document.getElementById('input_box');
+		const outputBox = document.getElementById('output_box');
+		const intBitsBox = document.getElementById('int_bits_box');
+		const fracBitsBox = document.getElementById('frac_bits_box');
+		const qValueBox = document.getElementById('q_output_format');
+		const useKeypadCheckbox = document.getElementById('use_keypad');
+		const keypadContainer = document.getElementById('keypad_container');
+		const pcButtonsContainer = document.getElementById('pc_buttons_container');
+		const helpModal = document.getElementById('help_modal');
+
+		function getSelectedRadio(name) {
+			const checked = document.querySelector(`input[name="${name}"]:checked`);
+			return checked ? checked.value : "REAL";
+		}
+
+		let currentOutputValue = "";
+		let currentOutputType = "";
+
+		function processButton(val) {
+			if (val === "R" || val === "Reset") {
+				inputBox.value = "";
+				outputBox.textContent = "";
+				qValueBox.textContent = "";
+				return;
+			}
+
+			if (val === "Enter" || val === "=") {
+				const inputMode = getSelectedRadio("input_mode");
+				const outputMode = getSelectedRadio("output_mode");
+				const intBits = parseInt(intBitsBox.value, 10) || 16;
+				const fracBits = parseInt(fracBitsBox.value, 10) || 16;
+
+				const [mainVal, calcResult, qValue] = compute_evaluation_step(
+					inputBox.value,
+					inputMode,
+					outputMode,
+					intBits,
+					fracBits,
+					false
+				);
+				inputBox.value = mainVal;
+				outputBox.textContent = calcResult;
+				qValueBox.textContent = qValue;
+				currentOutputValue = calcResult;
+				currentOutputType = outputMode;
+
+				if (typeof gtag === 'function') {
+					gtag('event', 'calculate', {
+						trigger_method: val
+					});
+				}
+			}
+			else if (val === "Back")
+			{
+				inputBox.value = inputBox.value.slice(0, -1);
+			}
+			else if (val === 'Type') {
+				if (currentOutputValue !== "" && currentOutputValue !== "ERROR") {
+					const outputMode = getSelectedRadio("output_mode");
+					const intBits = parseInt(intBitsBox.value, 10) || 16;
+					const fracBits = parseInt(fracBitsBox.value, 10) || 16;
+					console.log('Input = ', currentOutputValue, 'Input type = ', currentOutputType, 'Output type = ', outputMode);
+
+					const [updated_main, updated_aux, updated_qValue] = compute_evaluation_step(
+						currentOutputValue,
+						currentOutputType,
+						outputMode,
+						intBits,
+						fracBits,
+						false
+					);
+
+					outputBox.textContent = updated_aux;
+				}
+			}
+			else
+			{
+				inputBox.value += val;
+			}
+		}
+
+		document.querySelectorAll('[data-key]').forEach(btn => {
+			btn.addEventListener('click', () => {
+				processButton(btn.getAttribute('data-key'));
+			});
+		});
+
+		inputBox.addEventListener('keydown', (e) => {
+			if (e.key === 'Enter') {
+				e.preventDefault();
+				processButton('Enter');
+			}
+		});
+
+
+		function isMobileOSOrTouchOnly() {
+		  if (navigator.userAgentData && typeof navigator.userAgentData.mobile === 'boolean') {
+			return navigator.userAgentData.mobile;
+		  }
+
+		  const ua = navigator.userAgent || '';
+		  const isMobileOS = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
+
+		  const isIPadOS = /Macintosh/i.test(ua) && navigator.maxTouchPoints > 1;
+
+		  if (isMobileOS || isIPadOS) {
+			return true;
+		  }
+
+		  return window.matchMedia('(pointer: coarse)').matches;
+		}
+
+		window.addEventListener('DOMContentLoaded', () => {
+			const startInMobileMode = isMobileOSOrTouchOnly();
+
+			if (startInMobileMode) {
+				keypadContainer.style.display = 'grid';
+				pcButtonsContainer.style.display = 'none';
+				inputBox.setAttribute('readonly', true);
+			}
+			else
+			{
+				keypadContainer.style.display = 'none';
+				pcButtonsContainer.style.display = 'flex';
+				inputBox.removeAttribute('readonly');
+			}
+		});
+
+		useKeypadCheckbox.addEventListener('change', () => {
+			if (useKeypadCheckbox.checked) {
+				keypadContainer.style.display = 'grid';
+				pcButtonsContainer.style.display = 'none';
+				inputBox.setAttribute('readonly', true);
+			} else {
+				keypadContainer.style.display = 'none';
+				pcButtonsContainer.style.display = 'flex';
+				inputBox.removeAttribute('readonly');
+			}
+		});
+
+		// Trigger off of a change to the output format
+		document.getElementById('output_mode_container').addEventListener('change', function() {
+			processButton('Type');
+		});
+
+		document.getElementById('btn_help').addEventListener('click', () => {
+			helpModal.style.display = 'flex';
+		});
+
+		document.getElementById('btn_close_help').addEventListener('click', () => {
+			helpModal.style.display = 'none';
+		});
+
+		helpModal.addEventListener('click', (e) => {
+			if (e.target === helpModal) {
+				helpModal.style.display = 'none';
+			}
+		});
+	</script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-import { compute_evaluation_step } from './main_alu.js';
+import { compute_evaluation_step } from './calculator_top.js';
 
 let input = '';
 
