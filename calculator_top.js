@@ -87,9 +87,9 @@ function compute_evaluation_step(main_display_value, input_mode, output_mode, in
     if (!input_error) {
         if (((operand1.includes('.') || operand2.includes('.')) && ["&", "|", "^", "~"].includes(operator)) || (operator_error && operator !== "")) {
             if (["&", "|", "^", "~"].includes(operator)) {
-                return ["", "Enter logic operands without radix point"];
+                return ["", "Enter logic operands without radix point", ""];
             }
-            return ["", "ERROR"];
+            return ["", "ERROR", ""];
         } else if (!operand1_data_error && !operand2_data_error && !operator_error) {
             let operand1_binary;
             if (["~", "!"].includes(operator) || (operand2_present && ["&", "|", "^"].includes(operator))) {
@@ -99,6 +99,8 @@ function compute_evaluation_step(main_display_value, input_mode, output_mode, in
             }
 
             let calculator_result;
+            let binary_result = "";
+
             if (operand2_present) {
                 let operand2_binary;
                 if (["&", "|", "^"].includes(operator)) {
@@ -106,21 +108,43 @@ function compute_evaluation_step(main_display_value, input_mode, output_mode, in
                 } else {
                     operand2_binary = convert_to_binary(operand2, input_mode, int_bits, frac_bits);
                 }
-                const binary_result = binary_math_operation(operand1_binary, operand2_binary, operator, int_bits, frac_bits, output_mode, enable_print_statements);
+                binary_result = binary_math_operation(operand1_binary, operand2_binary, operator, int_bits, frac_bits, output_mode, enable_print_statements);
                 calculator_result = convert_from_binary(binary_result, output_mode);
             } else if (["~", "!", "2'S", "2's"].includes(operator)) {
-                const binary_result = binary_math_operation(operand1_binary, null, operator, int_bits, frac_bits, output_mode, enable_print_statements);
+                binary_result = binary_math_operation(operand1_binary, null, operator, int_bits, frac_bits, output_mode, enable_print_statements);
                 calculator_result = convert_from_binary(binary_result, output_mode);
             } else {
-                calculator_result = convert_from_binary(operand1_binary, output_mode);
+				binary_result = operand1_binary;
+                calculator_result = convert_from_binary(binary_result, output_mode);
             }
 
-            return [main_display_value, calculator_result];
+			let q_display_value = "";
+
+			if (output_mode === "HEX") {
+				let binary_size = binary_result.length;
+				let result_size = calculator_result.length * 4;
+
+				if (binary_result.includes('.')) {
+					let radix_index = binary_result.indexOf('.');
+					let q_fraction_size = binary_size - (radix_index + 1);
+					let q_integer_size = result_size - q_fraction_size;
+					q_display_value = `Q${q_integer_size}.${q_fraction_size}`;
+				}
+				else {
+					let q_integer_size = result_size;
+					let q_fraction_size = 0;
+					q_display_value = `Q${q_integer_size}.${q_fraction_size}`;
+				}
+			}
+			else {
+				q_display_value = "";
+			}
+            return [main_display_value, calculator_result, q_display_value];
         } else {
-            return ["", "ERROR"];
+            return ["", "ERROR", ""];
         }
     } else {
-        return ["", "ERROR"];
+        return ["", "ERROR", ""];
     }
 }
 
@@ -329,6 +353,7 @@ const inputBox = document.getElementById('input_box');
 const outputBox = document.getElementById('output_box');
 const intBitsBox = document.getElementById('int_bits_box');
 const fracBitsBox = document.getElementById('frac_bits_box');
+const qValueBox = document.getElementById('q_output_format');
 const useKeypadCheckbox = document.getElementById('use_keypad');
 const keypadContainer = document.getElementById('keypad_container');
 const pcButtonsContainer = document.getElementById('pc_buttons_container');
@@ -346,6 +371,7 @@ function processButton(val) {
     if (val === "R" || val === "Reset") {
         inputBox.value = "";
         outputBox.textContent = "";
+        qValueBox.textContent = "";
         return;
     }
 
@@ -355,7 +381,7 @@ function processButton(val) {
         const intBits = parseInt(intBitsBox.value, 10) || 16;
         const fracBits = parseInt(fracBitsBox.value, 10) || 16;
 
-        const [mainVal, calcResult] = compute_evaluation_step(
+        const [mainVal, calcResult, qValue] = compute_evaluation_step(
             inputBox.value,
             inputMode,
             outputMode,
@@ -365,6 +391,7 @@ function processButton(val) {
         );
         inputBox.value = mainVal;
         outputBox.textContent = calcResult;
+        qValueBox.textContent = qValue;
 		currentOutputValue = calcResult;
 		currentOutputType = outputMode;
 
@@ -385,7 +412,7 @@ function processButton(val) {
 			const fracBits = parseInt(fracBitsBox.value, 10) || 16;
        		console.log('Input = ', currentOutputValue, 'Input type = ', currentOutputType, 'Output type = ', outputMode);
 
-			const [updated_main, updated_aux] = compute_evaluation_step(
+			const [updated_main, updated_aux, updated_qValue] = compute_evaluation_step(
 				currentOutputValue,
 				currentOutputType,
 				outputMode,
