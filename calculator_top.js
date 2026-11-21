@@ -26,7 +26,7 @@ function isAlnum(ch) {
     return /^[a-z0-9]$/i.test(ch);
 }
 
-export function compute_evaluation_step(main_display_value, input_mode, output_mode, int_bits, frac_bits, enable_print_statements = false) {
+export function compute_evaluation_step(main_display_value, input_mode, output_mode, int_bits, frac_bits, enable_print_statements = false, gui_panel) {
     const nibble_size = Math.floor(int_bits / 4);
     let {
         left: operand1,
@@ -85,10 +85,22 @@ export function compute_evaluation_step(main_display_value, input_mode, output_m
 
     if (!input_error) {
         if (((operand1.includes('.') || operand2.includes('.')) && ["&", "|", "^", "~"].includes(operator)) || (operator_error && operator !== "")) {
-            if (["&", "|", "^", "~"].includes(operator)) {
-                return ["", "Enter logic operands without radix point", ""];
-            }
-            return ["", "ERROR", ""];
+			if (gui_panel === "Left") {
+				if (["&", "|", "^", "~"].includes(operator)){
+					if ((input_mode !== "BIN") && (input_mode !== "HEX")) {
+						return ["", "Use hex or binary input", ""];
+					}
+					else if ((output_mode === "BIN") || (output_mode === "HEX")) {
+						return ["", "Radix point not supported", ""];
+					}
+					else {
+						return ["", "Use hex or binary output", ""];
+					}
+				}
+			}
+			else {
+            	return ["", "", ""];
+			}
         } else if (!operand1_data_error && !operand2_data_error && !operator_error) {
             let operand1_binary;
             if (["~", "!"].includes(operator) || (operand2_present && ["&", "|", "^"].includes(operator))) {
