@@ -12,8 +12,8 @@
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FPGA Math Emulator & IEEE-754 Converter</title>
-    <meta name="description" content="Arbitrary-precision calculator for FPGA engineers. Supports IEEE 754 floating-point, signed two's complement binary, and custom fixed-point binary math.">
+	<title>FPGA Fixed-Point Calculator & IEEE-754 Hex/Binary Converter</title>
+	<meta name="description" content="Free bit-accurate Q-format fixed-point calculator and IEEE-754 FP32/FP64 converter. Convert between signed decimal, 2's complement hex, and binary for Verilog/VHDL.">
     <meta name="author" content="bldillahunt">
     <link rel="canonical" href="https://github.io">
     <link rel="stylesheet" href="styles.css">
@@ -25,7 +25,7 @@
             <h1>FPGA Math Emulator &amp; IEEE-754 Converter</h1>
             <p class="header-subtitle">Deterministic bit-level hardware math, Q-format fixed-point &amp; zero-builtin IEEE-754 encoding</p>
         </div>
-        <button type="button" id="btn_help" class="help-icon-btn" title="Syntax &amp; Documentation">? Guide</button>
+        <a href="#hardware-guide" class="guide-link-btn">? Guide</a>
     </header>
 
     <main class="workspace-grid">
@@ -92,9 +92,73 @@
 
             <div id="all_formats_list" class="all-formats-list"></div>
         </section>
-    </main>
 
-    <div id="help_modal" class="help-modal-overlay"></div>
+		<section id="hardware-guide" class="guide-container">
+		  <div class="guide-header">
+			<h2>FPGA Fixed-Point &amp; IEEE-754 Reference Guide</h2>
+			<p>
+			  Deterministic bit-accurate hardware math emulator for Verilog, VHDL, and embedded DSP workflows.
+			  Convert between signed decimal, 2's complement binary/hex, Q-format fixed-point, and IEEE-754 floating-point representations.
+			</p>
+		  </div>
+
+		  <div class="guide-grid">
+			<!-- Column 1: Data Types & Radix Rules -->
+			<div class="guide-card">
+			  <h3>Data Formats &amp; Radix Point Rules</h3>
+			  <ul>
+				<li>
+				  <strong>REAL (Signed Decimal):</strong> Standard base-10 values (e.g., <code>-12.625</code>, <code>3.14</code>) converted to exact hardware bit representations.
+				</li>
+				<li>
+				  <strong>HEX (2's Complement Integer):</strong> Hexadecimal inputs and outputs do <strong>not</strong> use a radix point. When converting a fractional result to HEX, check the <strong>Q-Format</strong> readout to see the implied radix point position.
+				</li>
+				<li>
+				  <strong>BIN (Binary with Radix Point):</strong> Supports an explicit binary point (e.g., <code>101.11</code>). Operands in an expression can have <strong>different integer and fraction bit widths</strong>—the engine aligns them automatically.
+				</li>
+				<li>
+				  <strong>FP32 &amp; FP64 (IEEE-754 Hex):</strong> 32-bit single precision and 64-bit double precision hex encodings for hardware FPU verification.
+				</li>
+			  </ul>
+			</div>
+
+			<!-- Column 2: Arithmetic, Bitwise & Complement Operators -->
+			<div class="guide-card">
+			  <h3>Supported Operators &amp; Syntax</h3>
+			  <ul>
+				<li>
+				  <strong>Arithmetic:</strong> Standard addition (<code>+</code>), subtraction (<code>-</code>), multiplication (<code>*</code>), division (<code>/</code>) and modulo (<code>%</code>).
+				</li>
+				<li>
+				  <strong>Bitwise Logic:</strong> Hardware bitwise AND (<code>&amp;</code>), OR (<code>|</code>), and XOR (<code>^</code>).
+				</li>
+				<li>
+				  <strong>Complements:</strong> Use <code>~</code> for bitwise inversion (<strong>1's complement</strong>) and <code>!</code> for arithmetic negation (<strong>2's complement</strong>).
+				</li>
+				<li>
+				  <strong>Clean Input Parsing:</strong> Spaces and <code>0x</code>/<code>0b</code> prefixes are stripped automatically. Example: <code>101.11 * 010.01</code>.
+				</li>
+			  </ul>
+			</div>
+
+			<!-- Column 3: Q-Format & Fraction Bits -->
+			<div class="guide-card">
+			  <h3>Q-Format &amp; Division Precision</h3>
+			  <ul>
+				<li>
+				  <strong>Automatic Width Sizing:</strong> Addition, subtraction, and multiplication preserve full bit accuracy across operands with mismatched integer or fractional widths.
+				</li>
+				<li>
+				  <strong>Fraction Bits Setting:</strong> Used primarily to set the output fractional precision (LSB resolution of <code>2^(-N)</code>) for <strong>division (<code>/</code>)</strong> operations and decimal conversions.
+				</li>
+				<li>
+				  <strong>Q-Format Readout:</strong> Displays the resulting <code>QM.N</code> format (<code>M</code> integer bits, <code>N</code> fraction bits) so you know exact bit-slicing boundaries for Verilog/VHDL registers.
+				</li>
+			  </ul>
+			</div>
+		  </div>
+		</section>
+    </main>
 
     <script type="module" src="calculator_top.js"></script>
     <script type="module" src="ui.js"></script>

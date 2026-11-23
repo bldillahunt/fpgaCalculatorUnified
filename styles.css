@@ -393,3 +393,108 @@ input:focus { outline: none; border-color: #FACC15; }
     font-weight: bold;
     cursor: pointer;
 }
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Top-right ? Guide link button */
+.guide-link-btn {
+  display: inline-block;
+  padding: 6px 14px;
+  font-family: 'Fira Code', 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #f5b041;
+  background-color: #18202c;
+  border: 1px solid #f5b041;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.guide-link-btn:hover {
+  background-color: #f5b041;
+  color: #18202c;
+}
+
+/* On-page SEO Reference Section */
+.guide-container {
+  max-width: 1180px;
+  margin: 28px auto 48px auto;
+  padding: 24px 28px;
+  background-color: #18202c;
+  border: 1px solid #2d3a4b;
+  border-radius: 10px;
+  color: #cbd5e1;
+  font-family: 'Fira Code', 'JetBrains Mono', 'Consolas', monospace;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.guide-header {
+  border-bottom: 1px solid #2d3a4b;
+  padding-bottom: 16px;
+  margin-bottom: 20px;
+}
+
+.guide-header h2 {
+  margin: 0 0 8px 0;
+  font-size: 1.2rem;
+  color: #f5b041;
+}
+
+.guide-header p {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: #94a3b8;
+}
+
+.guide-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 24px;
+}
+
+.guide-card {
+  background-color: #131a24;
+  border: 1px solid #263242;
+  border-radius: 8px;
+  padding: 18px 20px;
+}
+
+.guide-card h3 {
+  margin: 0 0 12px 0;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #5dade2;
+}
+
+.guide-card p,
+.guide-card li {
+  font-size: 0.84rem;
+  line-height: 1.65;
+  color: #cbd5e1;
+}
+
+.guide-card ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.guide-card li {
+  margin-bottom: 10px;
+}
+
+.guide-card strong {
+  color: #f8fafc;
+}
+
+.guide-card code {
+  background-color: #1e293b;
+  color: #f5b041;
+  padding: 2px 5px;
+  border-radius: 4px;
+  font-size: 0.82rem;
+}

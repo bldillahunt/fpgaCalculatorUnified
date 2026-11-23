@@ -34,27 +34,4 @@ export function renderDynamicUI() {
         `<button type="button" data-key="${key}" class="${cls}">${label || key}</button>`
     ).join('');
 
-    document.getElementById('help_modal').innerHTML = `
-        <div class="help-panel">
-            <div class="help-text">
-                <h3>How It Works</h3>
-                <p>This calculator emulates how an FPGA performs hardware math and bitwise logic. All operands convert to binary before execution, and results convert into all output formats simultaneously without built-in floating-point shortcuts.</p>
-                <h3>Supported Data Types</h3>
-                <ul>
-                    <li><strong>REAL:</strong> Standard signed decimal numbers (e.g., <code>-12.75</code>).</li>
-                    <li><strong>HEX:</strong> 2's complement hexadecimal (optional <code>0x</code> prefix stripped).</li>
-                    <li><strong>BIN:</strong> 2's complement binary (optional <code>0b</code> prefix stripped); supports a binary point (e.g., <code>101.11</code>) for Q-format fixed-point values. Short binary inputs are <strong>sign-extended</strong> automatically.</li>
-                    <li><strong>FP32 (Hex) &amp; FP64 (Hex):</strong> Raw IEEE-754 32-bit (8 hex digits) or 64-bit (16 hex digits) bit-patterns. To convert a decimal number into FP32/FP64 hex, select <strong>REAL</strong> as Input Format.</li>
-                </ul>
-                <h3>Operations &amp; Syntax</h3>
-                <ul>
-                    <li><strong>Math:</strong> <code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>, and modulo (<code>%</code>).</li>
-                    <li><strong>Bitwise &amp; Logic:</strong> AND (<code>&amp;</code>), OR (<code>|</code>), XOR (<code>^</code>), NOT (<code>~</code>), and 2's complement (<code>!</code>).</li>
-                    <li><strong>Forgiving Formatting:</strong> Spaces and <code>0x</code> / <code>0b</code> prefixes are cleaned automatically.</li>
-                </ul>
-                <p style="margin-top: 12px;">Found a bug or have a feature request? <a href="https://github.com" target="_blank" rel="noopener noreferrer">Report an issue on GitHub</a>.</p>
-            </div>
-            <button type="button" id="btn_close_help" class="close-help-btn">Close Guide</button>
-        </div>
-    `;
 }

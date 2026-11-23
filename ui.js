@@ -128,6 +128,3 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 useKeypadCheckbox.addEventListener('change', () => setKeypadVisibility(useKeypadCheckbox.checked));
-document.getElementById('btn_help').addEventListener('click', () => { helpModal.style.display = 'flex'; });
-document.getElementById('btn_close_help').addEventListener('click', () => { helpModal.style.display = 'none'; });
-helpModal.addEventListener('click', (e) => { if (e.target === helpModal) helpModal.style.display = 'none'; });
