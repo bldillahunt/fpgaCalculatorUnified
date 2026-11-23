@@ -84,9 +84,9 @@ export function compute_evaluation_step(main_display_value, input_mode, output_m
     const operator_error = verify_operator(operator, input_mode, output_mode);
 
     if (!input_error) {
-        if (((operand1.includes('.') || operand2.includes('.')) && ["&", "|", "^", "~"].includes(operator)) || (operator_error && operator !== "")) {
+        if (((operand1.includes('.') || operand2.includes('.')) && ["&", "|", "^", "~", "!"].includes(operator)) || (operator_error && operator !== "")) {
 			if (gui_panel === "Left") {
-				if (["&", "|", "^", "~"].includes(operator)){
+				if (["&", "|", "^", "~", "!"].includes(operator)){
 					if ((input_mode !== "BIN") && (input_mode !== "HEX")) {
 						return ["", "Use hex or binary input", ""];
 					}
