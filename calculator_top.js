@@ -26,68 +26,85 @@ function isAlnum(ch) {
     return /^[a-z0-9]$/i.test(ch);
 }
 
-export function compute_evaluation_step(main_display_value, input_mode, output_mode, int_bits, frac_bits, enable_print_statements = false, gui_panel) {
+export function compute_evaluation_step(main_display_value, input_mode1, input_mode2, output_mode, int_bits, frac_bits, enable_print_statements = false, gui_panel) {
     const nibble_size = Math.floor(int_bits / 4);
-    let {
-        left: operand1,
-        op: operator,
-        right: operand2,
-        operand1_present,
-        operator_present,
-        operand2_present,
-        input_error
-    } = parse_input_string(main_display_value);
+    let input_index = 0;
+	let	operand1 = "";
+	let	left_unary = "";
+	let	operator = "";
+	let	operand1_present = false;
+	let	operator_present = false;
+	let current_index = 0;
+	let input_error = false;
+
+	console.log(main_display_value);
+
+	[operand1, left_unary, operator, operand1_present, operator_present, input_error, current_index] = parse_input_string(main_display_value, input_index);
+
+	let	operand2 = "";
+	let	right_unary = "";
+	let	null_operator = "";
+	let	operand2_present = false;
+	let	null_operator_present = false;
+	let	output_index = 0;
+
+	if (operator_present === true) {
+		[operand2, right_unary, null_operator, operand2_present, null_operator_present, input_error, output_index] = parse_input_string(main_display_value, current_index);
+	}
+	else {
+		operand2 = "";
+		right_unary = "";
+		operand2_present = false;
+	}
+
+	console.log(operand1, operator, operand2, input_error, input_mode1, input_mode2, operand1_present, operand2_present);
 
     let operand1_data_error = false;
     let operand2_data_error = false;
 
     if (!input_error) {
-        if (input_mode === "REAL") {
+        if (input_mode1 === "REAL") {
             operand1_data_error = verify_real_input(operand1);
-            if (operand2 !== "") {
-                operand2_data_error = verify_real_input(operand2);
-            }
-        } else if (input_mode === "HEX") {
+        } else if (input_mode1 === "HEX") {
             if (operand1.length > 0 && operand1.length < nibble_size) {
                 const padChar = HEX_NEGATIVE_LIST.includes(operand1[0]) ? "F" : "0";
                 operand1 = operand1.padStart(nibble_size, padChar);
             }
             operand1_data_error = verify_hex_input(operand1, int_bits, frac_bits);
-
-            if (operand2_present) {
-                if (operand2.length > 0 && operand2.length < nibble_size) {
-                    const padChar = HEX_NEGATIVE_LIST.includes(operand2[0]) ? "F" : "0";
-                    operand2 = operand2.padStart(nibble_size, padChar);
-                }
-                operand2_data_error = verify_hex_input(operand2, int_bits, frac_bits);
-            }
-        } else if (input_mode === "BIN") {
+        } else if (input_mode1 === "BIN") {
             operand1_data_error = verify_bin_input(operand1);
-            if (operand2 !== "") {
-                operand2_data_error = verify_bin_input(operand2);
-            } else if (operator_present && !operand2_present) {
-                operand2_data_error = true;
-            }
-        } else if (input_mode === "FP32") {
+        } else if (input_mode1 === "FP32") {
             operand1_data_error = verify_fp32_input(operand1);
-            if (operand2_present) {
-                operand2_data_error = verify_fp32_input(operand2);
-            }
-        } else if (input_mode === "FP64") {
+        } else if (input_mode1 === "FP64") {
             operand1_data_error = verify_fp64_input(operand1);
-            if (operand2_present) {
-                operand2_data_error = verify_fp64_input(operand2);
-            }
         }
+
+		if (operator_present === true) {
+			if (input_mode2 === "REAL") {
+				operand2_data_error = verify_real_input(operand2);
+			} else if (input_mode2 === "HEX") {
+				if (operand2.length > 0 && operand2.length < nibble_size) {
+					const padChar = HEX_NEGATIVE_LIST.includes(operand2[0]) ? "F" : "0";
+					operand2 = operand2.padStart(nibble_size, padChar);
+				}
+				operand2_data_error = verify_hex_input(operand2, int_bits, frac_bits);
+			} else if (input_mode2 === "BIN") {
+				operand2_data_error = verify_bin_input(operand2);
+			} else if (input_mode2 === "FP32") {
+				operand2_data_error = verify_fp32_input(operand2);
+			} else if (input_mode2 === "FP64") {
+				operand2_data_error = verify_fp64_input(operand2);
+			}
+		}
     }
 
-    const operator_error = verify_operator(operator, input_mode, output_mode);
+    const operator_error = verify_operator(operator, input_mode1, output_mode);
 
     if (!input_error) {
         if (((operand1.includes('.') || operand2.includes('.')) && ["&", "|", "^", "~", "!"].includes(operator)) || (operator_error && operator !== "")) {
 			if (gui_panel === "Left") {
 				if (["&", "|", "^", "~", "!"].includes(operator)){
-					if ((input_mode !== "BIN") && (input_mode !== "HEX")) {
+					if (((input_mode1 !== "BIN") && (input_mode1 !== "HEX")) || ((input_mode2 !== "BIN") && (input_mode2 !== "HEX"))) {
 						return ["", "Use hex or binary input", ""];
 					}
 					else if ((output_mode === "BIN") || (output_mode === "HEX")) {
@@ -103,22 +120,38 @@ export function compute_evaluation_step(main_display_value, input_mode, output_m
 			}
         } else if (!operand1_data_error && !operand2_data_error && !operator_error) {
             let operand1_binary;
-            if (["~", "!"].includes(operator) || (operand2_present && ["&", "|", "^"].includes(operator))) {
-                operand1_binary = convert_to_binary(operand1, input_mode, int_bits, 0);
-            } else {
-                operand1_binary = convert_to_binary(operand1, input_mode, int_bits, frac_bits);
-            }
+            let operand1_unary;
+
+            if (left_unary === "~" || left_unary === "!") {
+				operand1_unary = convert_to_binary(operand1, input_mode1, int_bits, 0);
+				operand1_binary = binary_math_operation(operand1_unary, "", left_unary, int_bits, frac_bits, "BIN", enable_print_statements);
+			}
+			else {
+				if (["~", "!"].includes(operator) || (operand2_present && ["&", "|", "^"].includes(operator))) {
+					operand1_binary = convert_to_binary(operand1, input_mode1, int_bits, 0);
+				} else {
+					operand1_binary = convert_to_binary(operand1, input_mode1, int_bits, frac_bits);
+				}
+			}
 
             let calculator_result;
             let binary_result = "";
 
             if (operand2_present) {
                 let operand2_binary;
-                if (["&", "|", "^"].includes(operator)) {
-                    operand2_binary = convert_to_binary(operand2, input_mode, int_bits, 0);
-                } else {
-                    operand2_binary = convert_to_binary(operand2, input_mode, int_bits, frac_bits);
-                }
+				let operand2_unary;
+
+				if (right_unary === "~" || right_unary === "!") {
+					operand2_unary = convert_to_binary(operand2, input_mode2, int_bits, 0);
+					operand2_binary = binary_math_operation(operand2_unary, "", right_unary, int_bits, frac_bits, "BIN", enable_print_statements);
+				}
+				else {
+					if (["&", "|", "^"].includes(operator)) {
+						operand2_binary = convert_to_binary(operand2, input_mode2, int_bits, 0);
+					} else {
+						operand2_binary = convert_to_binary(operand2, input_mode2, int_bits, frac_bits);
+					}
+				}
                 binary_result = binary_math_operation(operand1_binary, operand2_binary, operator, int_bits, frac_bits, output_mode, enable_print_statements);
                 calculator_result = convert_from_binary(binary_result, output_mode);
             } else if (["~", "!", "2'S", "2's"].includes(operator)) {
@@ -159,103 +192,90 @@ export function compute_evaluation_step(main_display_value, input_mode, output_m
     }
 }
 
-function parse_input_string(input_string) {
+function parse_input_string(input_string, input_index) {
     let state = 'Empty_String_Check';
     const data_length = input_string.length;
-    let input_index = 0;
-    let left = "", op = "", right = "";
-    let operand1_present = false;
+    let operand = "";
+    let unary = ""
+    let operator = "";
+    let operand_present = false;
     let operator_present = false;
-    let operand2_present = false;
     let input_error = false;
 
     while (true) {
         if (state === 'Empty_String_Check') {
             if (!input_string) {
-                return { left: "", op: "", right: "", operand1_present: false, operator_present: false, operand2_present: false, input_error: true };
+				console.log("No input string", operand, input_index);
+                return [ operand, unary, operator, operand_present, operator_present, true, input_index ];
             }
             state = 'First_Character';
         } else if (state === 'First_Character') {
-            if (input_string.startsWith("2's") || input_string.startsWith("2'S")) {
-                op = "2'S";
-                if (data_length > 3) {
-                    input_index = 3;
-                    state = 'First_Operand';
-                    continue;
-                } else {
-                    return { left: "", op: "", right: "", operand1_present: false, operator_present: false, operand2_present: false, input_error: true };
-                }
-            }
-
             const ch = input_string[input_index];
+
             if (['+', '~', '!'].includes(ch)) {
-                if (['~', '!'].includes(ch)) op = ch;
+                if (['~', '!'].includes(ch)) unary = ch;
+
                 if (data_length > 1) {
                     input_index += 1;
-                    state = 'First_Operand';
+                    state = 'CAPTURE_OPERAND';
                 } else {
-                    return { left: "", op: "", right: "", operand1_present: false, operator_present: false, operand2_present: false, input_error: true };
+					console.log("Single character", operand, input_index, ch);
+                    return [ operand, unary, operator, operand_present, operator_present, true, input_index ];
                 }
-            } else if (ch === '-' || isAlnum(ch) || ch === '.') {
-                left += ch;
+            } else if (ch === '-') {
+                operand += ch;
+
                 if (data_length > 1) {
                     input_index += 1;
-                    state = 'First_Operand';
+                    state = 'CAPTURE_OPERAND';
                 } else {
-                    return { left, op, right, operand1_present, operator_present, operand2_present, input_error };
+					console.log("Minus sign", operand, input_index, ch);
+                    return [ operand, unary, operator, operand_present, operator_present, true, input_index ];
                 }
-            } else {
-                return { left: "", op: "", right: "", operand1_present: false, operator_present: false, operand2_present: false, input_error: true };
             }
-        } else if (state === 'First_Operand') {
+            else if (isAlnum(ch)) {
+                operand += ch;
+                operand_present = true;
+
+                if (data_length > 1) {
+                    input_index += 1;
+                    state = 'CAPTURE_OPERAND';
+                } else {
+                    return [ operand, unary, operator, operand_present, operator_present, input_error, input_index ];
+                }
+			}
+            else {
+				console.log("Unknown first character", operand, input_index, ch);
+                return [ operand, unary, operator, operand_present, operator_present, true, input_index ];
+            }
+        } else if (state === 'CAPTURE_OPERAND') {
             const ops = ["+", "-", "*", "/", "%", "&", "|", "^"];
-            while (input_index < data_length && !ops.includes(input_string[input_index])) {
+
+            while ((input_index < data_length) && (!ops.includes(input_string[input_index]))) {
                 const ch = input_string[input_index];
+
                 if (isAlnum(ch) || ch === '.') {
-                    left += ch;
+                    operand += ch;
+
                     if (input_index < data_length - 1) {
                         input_index += 1;
                     } else {
-                        operand1_present = true;
-                        return { left, op, right, operand1_present, operator_present, operand2_present, input_error };
+                        operand_present = true;
+                        return [ operand, unary, operator, operand_present, operator_present, input_error, input_index ];
                     }
                 } else {
-                    return { left: "", op: "", right: "", operand1_present: false, operator_present: false, operand2_present: false, input_error: true };
+					console.log("Unknown character in operand", operand, input_index, ch);
+                    return [ operand, unary, operator, operand_present, operator_present, true, input_index ];
                 }
             }
 
-            operand1_present = true;
+            operand_present = true;
             operator_present = true;
-            if (!['~', '!', "2'S"].includes(op)) {
-                op = input_string[input_index];
-            }
-            input_index += 1;
-
-            if (input_index < data_length) {
-                state = 'Second_Operand';
-            } else {
-                operand2_present = false;
-                return { left, op, right, operand1_present, operator_present, operand2_present, input_error };
-            }
-        } else if (state === 'Second_Operand') {
-            while (input_index < data_length) {
-                const ch = input_string[input_index];
-                if (isAlnum(ch) || ch === '.' || (right === "" && ch === '-')) {
-                    right += ch;
-                    if (input_index < data_length - 1) {
-                        input_index += 1;
-                    } else {
-                        operand2_present = true;
-                        return { left, op, right, operand1_present, operator_present, operand2_present, input_error };
-                    }
-                } else {
-                    return { left: "", op: "", right: "", operand1_present: false, operator_present: false, operand2_present: false, input_error: true };
-                }
-            }
-            operand2_present = true;
-            return { left, op, right, operand1_present, operator_present, operand2_present, input_error };
-        }
-    }
+			operator = input_string[input_index];
+			input_index += 1;
+            return [ operand, unary, operator, operand_present, operator_present, input_error, input_index ];
+    	}
+	}
 }
 function verify_real_input(input_string) {
     return input_string.trim() === "" || isNaN(Number(input_string));
@@ -282,22 +302,22 @@ function verify_fp64_input(input_string) {
     return input_string.length !== 16;
 }
 
-function verify_operator(input_string, input_mode, output_mode) {
+function verify_operator(input_string, input_mode1, output_mode) {
     let logic_error = false;
     if (["&", "|", "^", "~", "!", "2'S", "2's"].includes(input_string)) {
-        logic_error = ["REAL", "FP32", "FP64"].includes(input_mode) || ["REAL", "FP32", "FP64"].includes(output_mode);
+        logic_error = ["REAL", "FP32", "FP64"].includes(input_mode1) || ["REAL", "FP32", "FP64"].includes(output_mode);
     }
     return (!["+", "-", "*", "/", "%", "&", "|", "^", "~", "!", "2'S", "2's", ""].includes(input_string)) || logic_error;
 }
 
-function convert_to_binary(operand, input_mode, int_bits, frac_bits) {
-    if (input_mode === "REAL") {
+function convert_to_binary(operand, input_mode1, int_bits, frac_bits) {
+    if (input_mode1 === "REAL") {
         return binary_string_to_int_list(real_to_twos_comp_binary(operand, int_bits, frac_bits));
-    } else if (input_mode === "HEX") {
+    } else if (input_mode1 === "HEX") {
         return binary_string_to_int_list(hexadecimal_to_binary(operand, int_bits, lookup_table));
-    } else if (input_mode === "FP32") {
+    } else if (input_mode1 === "FP32") {
         return ieee754_hex_to_binary(operand, precision_profile["SINGLE"], lookup_table);
-    } else if (input_mode === "FP64") {
+    } else if (input_mode1 === "FP64") {
         return ieee754_hex_to_binary(operand, precision_profile["DOUBLE"], lookup_table);
     } else {
         return binary_string_to_int_list(operand);

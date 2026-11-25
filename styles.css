@@ -498,3 +498,157 @@ html {
   border-radius: 4px;
   font-size: 0.82rem;
 }
+
+.hidden {
+  display: none !important;
+}
+
+.input-mode-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.panel-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #94a3b8;
+}
+
+/* Segmented Toggle Switch */
+.mode-switch {
+  display: inline-flex;
+  background-color: #0f151e;
+  border: 1px solid #2d3a4b;
+  border-radius: 6px;
+  padding: 2px;
+}
+
+.mode-btn {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.mode-btn.active {
+  background-color: #f5b041;
+  color: #131a24;
+}
+
+/* Simple Builder Layout */
+.simple-builder {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background-color: #131a24;
+  border: 1px solid #263242;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.builder-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.row-hint {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin-right: 4px;
+}
+
+.input-group {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  gap: 6px;
+  width: 100%;
+}
+
+.dark-input {
+  flex: 1;
+  min-width: 0;
+  background-color: #0f151e;
+  border: 1px solid #2d3a4b;
+  border-radius: 6px;
+  color: #f8fafc;
+  font-family: 'Fira Code', 'JetBrains Mono', monospace;
+  font-size: 0.95rem;
+  padding: 8px 10px;
+}
+
+.dark-input:focus {
+  outline: none;
+  border-color: #f5b041;
+}
+
+.dark-select {
+  background-color: #1e293b;
+  border: 1px solid #2d3a4b;
+  border-radius: 6px;
+  color: #f5b041;
+  font-family: 'Fira Code', 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 8px 10px;
+  cursor: pointer;
+}
+
+/* Operator Pills */
+.operator-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 4px;
+}
+
+.op-pill {
+  background-color: #1e293b;
+  border: 1px solid #2d3a4b;
+  border-radius: 5px;
+  color: #cbd5e1;
+  font-family: 'Fira Code', 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 6px 8px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s ease;
+}
+
+.op-pill:hover {
+  border-color: #5dade2;
+  color: #ffffff;
+}
+
+.op-pill.active {
+  background-color: #5dade2;
+  border-color: #5dade2;
+  color: #0f151e;
+}
+
+/* Add this new rule for the small prefix input boxes */
+.prefix-input {
+  flex: 0 0 46px;
+  width: 46px;
+  padding: 8px 4px;
+  text-align: center;
+  color: #5dade2;
+  font-weight: 700;
+}
+
+.prefix-input::placeholder {
+  color: #475569;
+  font-size: 0.75rem;
+  font-weight: normal;
+}

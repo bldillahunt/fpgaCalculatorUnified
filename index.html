@@ -31,8 +31,62 @@
     <main class="workspace-grid">
         <section class="panel-card">
 
-            <label class="field-label" for="input_box">Input Expression <span class="hint-inline">(spaces &amp; 0x/0b stripped)</span></label>
-            <input type="text" id="input_box" value="" placeholder="e.g., 3.14 or 101.11 * 010.01" autocomplete="off" autocapitalize="off" spellcheck="false">
+			<!-- Mode Toggle Header -->
+			<div class="input-mode-header">
+			  <span class="panel-label">INPUT EXPRESSION</span>
+			  <div class="mode-switch" role="group" aria-label="Input Mode">
+				<button type="button" id="btn-mode-simple" class="mode-btn active">Simple</button>
+				<button type="button" id="btn-mode-advanced" class="mode-btn">Advanced</button>
+			  </div>
+			</div>
+
+			<!-- SIMPLE MODE: Guided Mixed-Type Builder -->
+			<div id="simple-input-panel" class="simple-builder">
+			  <!-- Row 1: Prefix A + Operand A + Type Dropdown -->
+			  <div class="builder-row input-group">
+				<input type="text" id="simple-prefix-a" class="dark-input prefix-input" maxlength="1" placeholder="~ / !" title="Optional prefix: ~ (1's Comp) or ! (2's Comp)" autocomplete="off">
+				<input type="text" id="simple-op-a" class="dark-input" placeholder="Operand A (e.g. FF00)">
+				<select id="simple-type-a" class="dark-select">
+				  <option value="REAL" selected>REAL</option>
+				  <option value="HEX">HEX</option>
+				  <option value="BIN">BIN</option>
+				  <option value="FP32">FP32</option>
+				  <option value="FP64">FP64</option>
+				</select>
+			  </div>
+
+			  <!-- Row 2: Binary Operator Buttons -->
+			  <div class="builder-row operator-grid">
+				<button type="button" class="op-pill bin-op active" data-op="+">+</button>
+				<button type="button" class="op-pill bin-op" data-op="-">-</button>
+				<button type="button" class="op-pill bin-op" data-op="*">&times;</button>
+				<button type="button" class="op-pill bin-op" data-op="/">&divide;</button>
+				<button type="button" class="op-pill bin-op" data-op="%">%</button>
+				<button type="button" class="op-pill bin-op" data-op="&">&amp;</button>
+				<button type="button" class="op-pill bin-op" data-op="|">|</button>
+				<button type="button" class="op-pill bin-op" data-op="^">^</button>
+			  </div>
+
+			  <!-- Row 3: Prefix B + Operand B + Type Dropdown -->
+			  <div class="builder-row input-group">
+				<input type="text" id="simple-prefix-b" class="dark-input prefix-input" maxlength="1" placeholder="~ / !" title="Optional prefix: ~ (1's Comp) or ! (2's Comp)" autocomplete="off">
+				<input type="text" id="simple-op-b" class="dark-input" placeholder="Operand B (optional)">
+				<select id="simple-type-b" class="dark-select">
+				  <option value="REAL">REAL</option>
+				  <option value="HEX">HEX</option>
+				  <option value="BIN" selected>BIN</option>
+				  <option value="FP32">FP32</option>
+				  <option value="FP64">FP64</option>
+				</select>
+			  </div>
+			</div>
+
+			<!-- ADVANCED MODE: Your Existing Single-Line Expression Box -->
+			<div id="advanced-input-panel" class="advanced-builder hidden">
+			  	<!-- <input type="text" id="main-expression-input" class="dark-input" placeholder="e.g. (101.11 * 010.01) + ~001.10"> -->
+				<label class="field-label" for="input_box">Input Expression <span class="hint-inline">(spaces &amp; 0x/0b stripped)</span></label>
+				<input type="text" id="input_box" value="" placeholder="e.g., 3.14 or 101.11 * 010.01" autocomplete="off" autocapitalize="off" spellcheck="false">
+			</div>
 
             <div class="primary-output-box">
                 <div class="primary-output-header">
